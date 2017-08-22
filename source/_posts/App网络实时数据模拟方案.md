@@ -35,13 +35,7 @@ tags: iOS, Andoird, Network, Mock, RealTime
 
 那天的一件事突然激发了灵感，想出了目前最完美的方案。那天具体目的是啥忘了，总之想要在本机开启一个http静态服务器，设置到任意一个本地目录为root，把里面的内容可以被别人下载访问，看了下mac自带的Apache，需要设置虚拟机等配置，并不是很方便，没法达到我最简单最纯粹的目的。
 
-最终还是探索出了一行命令在任意目录开启http服务的途径
-
-```bash 一行命令在当前目录开启http服务
-SCREEN -d -m python -m SimpleHTTPServer 7777
-```
-
-这行命令就可以以当前执行命令的目录为root开启一个7777端口的静态服务器，这句话试了目前主流的macOS版本都支持这样启动。
+最终还是探索出了一行命令在任意目录开启http服务的途径，后面会详细介绍。
 
 由此突然想到，如果我把静态服务器root置为项目目录下的mock文件夹，再将本机ip让app感知到，那在运行的时候就可以将请求转发给ip指向的机器，来做到实时mock数据的功能！
 
@@ -67,8 +61,25 @@ value="192.168.2.101"
 /usr/libexec/Plistbuddy -c "Delete :${key}" "${plist}"
 /usr/libexec/Plistbuddy -c "Add :${key} string ${value}" "${plist}"
 ```
+
+### 2. 在编译机上工程项目Mock目录下启动http静态服务
+
+脚本cd到Mock目录下，执行下面命令就可以。
+
+```bash 在当前目录开启http服务
+lsof -ti:7777 | xargs kill
+SCREEN -d -m python -m SimpleHTTPServer 7777
+```
+
+第一行命令清理一下占用7777端口的应用。
+第二行命令可以以当前执行命令的目录为root开启一个7777端口的静态服务器，这句话试了目前主流的macOS版本都支持这样启动。
+
+ps. 解释下Mock目录，Mock目录我的设计是目录中存放的是所有以apiname.json为文件名的请求结果字符串文本文件。
+这个目录存放在项目的Resource目录下，直接以物理目录在Xcode下可见。
+目的是为了在开发过程中方便随时新增和修改内容，不需要再切换其他编辑器来修改。
+
    
-### 2. 让app发起网络请求时转发到mock服务器
+### 3. 让app发起网络请求时转发到mock服务器
 
 这里没什么代码可以提供，大体就是app上得有个开关，可以随时开关app的mock和非mock状态，根据这个标志位，网络请求生成的请求URL会有所不同：
 
@@ -81,13 +92,13 @@ value="192.168.2.101"
   正常生成url请求
   
   
-### 3. 局部数据模拟 
+### 4. 局部数据模拟 
   
 这里还可以做一下容错，大体是如果mock模式下，请求`http://192.168.2.101:7777/xmmock/xxx.json`后如果是非200，说明这个mock文件不存在，则继续发送正常请求，以确保没有在mock范围内的接口在app中还是可以正常访问。
 
 这样就做到了app接口整体可用，只有在mock模式下，在mock范围内的接口会被mock。
 
-### 4. 清理尾巴
+### 5. 清理尾巴
 
 这里有点小尾巴，比如之前生成的在plist文件中加入了一个键值标明当前压包的机器ip，这个键值在git中显示是一个修改，这样每个人修改这个代码很容易冲突。
 
@@ -104,4 +115,66 @@ plist="${PROJECT_DIR}/${INFOPLIST_FILE}"
 
 目前我们团队的iOS组内已经使用这套方案成熟运行了好几个版本，开发效率提升明显。
 
+
+## 附上完整脚本
+
+将以下deploy脚本插入到"Build Phases"里尽可能前面的环节，实际操作总我放在"Copy Bundle Resources"的前面。
+
+```bash XMNetworkMockDeploy.sh
+#!/bin/sh
+## 给plist赋值函数
+setValueToPlist() {
+    plist="${PROJECT_DIR}/${INFOPLIST_FILE}"
+    
+    key="$1"
+    value="$2"
+    /usr/libexec/Plistbuddy -c "Delete :${key}" "${plist}"
+    /usr/libexec/Plistbuddy -c "Add :${key} string ${value}" "${plist}"
+    echo "XMNetworkMock::在PLIST设定${key}值为${value}"
+}
+
+echo "XMNetworkMock::CONFIGURATION:${CONFIGURATION}"
+echo "XMNetworkMock::PROJECT_DIR:${PROJECT_DIR}"
+
+if [[ $CONFIGURATION == "Debug" ]]; then
+
+## 获取主机IP地址
+ASB_HOST_IP=`ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}'`
+setValueToPlist "XM_MOCK_IP" $ASB_HOST_IP
+echo "XMNetworkMock::主机IP地址${ASB_HOST_IP}"
+
+## 清理端口进程
+lsof -ti:7777 | xargs kill
+echo "XMNetworkMock::端口占用清理完毕"
+
+## 进入目录 
+ASB_DIR_MOCK_API="${PROJECT_DIR}/Resources/xmmock"
+mkdir -p $ASB_DIR_MOCK_API
+echo "XMNetworkMock::打开目录${ASB_MOCK_API}"
+
+## 开启网络服务
+cd $ASB_DIR_MOCK_API
+SCREEN -d -m python -m SimpleHTTPServer 7777
+echo "XMNetworkMock::启动网络服务 ${ASB_DIR_MOCK_API}:7777"
+
+else
+echo "XMNetworkMock::检测到非开发模式，已清理调试选项ASC_HOST_IP的值"
+fi
+```
+
+以下clean脚本放置在"Build Phases"的最后一个流程即可
+
+```bash XMNetworkMockClean.sh
+#!/bin/sh
+deleteValue() {
+plist="${PROJECT_DIR}/${INFOPLIST_FILE}"
+key="$1"
+/usr/libexec/Plistbuddy -c "Delete :${key}" "${plist}"
+}
+if [[ $CONFIGURATION == "Debug" ]]; then
+deleteValue "XM_MOCK_IP"
+fi
+```
+
+ps. 注意脚本中相关目录。
 
