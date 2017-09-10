@@ -1,5 +1,5 @@
 ---
-title: iOS App间相互跳转漫谈 - UniversalLinks的极致使用
+title: iOS App间相互跳转漫谈 - part1
 date: 2017-09-07 23:48:26
 tags: iOS,UniversalLinks,Google,DynamicLinks
 ---
@@ -90,7 +90,7 @@ tags: iOS,UniversalLinks,Google,DynamicLinks
    ```
 
 App端
-1. 找到 Alibaba.entitlements 文件
+1. 找到 AppName.entitlements 文件
 2. 在里面 `com.apple.developer.associated-domains` 的数组下面添加一个item
 3. 值为 `applinks:m.alibaba.com` 即可
 
