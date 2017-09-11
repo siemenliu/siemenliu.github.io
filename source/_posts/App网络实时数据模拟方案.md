@@ -1,7 +1,12 @@
 ---
 title: App网络实时数据模拟方案
 date: 2017-08-21 23:57:22
-tags: iOS, Andoird, Network, Mock, RealTime
+tags: 
+- iOS
+- Andoird
+- Network
+- Mock
+- RealTime
 ---
 
 ## 背景

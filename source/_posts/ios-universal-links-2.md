@@ -1,7 +1,11 @@
 ---
 title: iOS App间相互跳转漫谈 - part2
 date: 2017-09-10 14:07:20
-tags: iOS,UniversalLinks,Google,DynamicLinks
+tags: 
+- iOS
+- UniversalLinks
+- Google
+- DynamicLinks
 ---
 
 ## 写在前面
