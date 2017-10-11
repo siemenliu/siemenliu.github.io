@@ -3,18 +3,18 @@
 <head>
   <meta charset="utf-8">
   
-  <title>iOS开发方式的最佳实践思考与容器化方案之一 | 刘哈笔记</title>
+  <title>iOS容器化方案 | 刘哈笔记</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="背景随着业务不断的发展，组织结构的调整，对于垂直化业务划分的团队来说，App的解耦需求变得越来越迫切。 举个栗子🌰来说：通过垂直化业务划分后，一个团队负责“首页”+“搜索”+“产品详情“；另一个团队负责“我的”； 这两个团队分别负责不同的代码，没有交叉的代码，端开发同学对号入座，原则上不会产生交叉资源。 这与之前普通的开发方式的区别是，之前端开发同学们相当于一个池子，有需求过来，这个版本需要做哪">
 <meta name="keywords" content="iOS,Container,容器化,解耦,组件化,最佳实践">
 <meta property="og:type" content="article">
-<meta property="og:title" content="iOS开发方式的最佳实践思考与容器化方案之一">
+<meta property="og:title" content="iOS容器化方案">
 <meta property="og:url" content="http://www.liuxiaoming.com/2017/09/05/ios-container/index.html">
 <meta property="og:site_name" content="刘哈笔记">
 <meta property="og:description" content="背景随着业务不断的发展，组织结构的调整，对于垂直化业务划分的团队来说，App的解耦需求变得越来越迫切。 举个栗子🌰来说：通过垂直化业务划分后，一个团队负责“首页”+“搜索”+“产品详情“；另一个团队负责“我的”； 这两个团队分别负责不同的代码，没有交叉的代码，端开发同学对号入座，原则上不会产生交叉资源。 这与之前普通的开发方式的区别是，之前端开发同学们相当于一个池子，有需求过来，这个版本需要做哪">
-<meta property="og:updated_time" content="2017-09-10T07:11:25.000Z">
+<meta property="og:updated_time" content="2017-09-27T13:36:33.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="iOS开发方式的最佳实践思考与容器化方案之一">
+<meta name="twitter:title" content="iOS容器化方案">
 <meta name="twitter:description" content="背景随着业务不断的发展，组织结构的调整，对于垂直化业务划分的团队来说，App的解耦需求变得越来越迫切。 举个栗子🌰来说：通过垂直化业务划分后，一个团队负责“首页”+“搜索”+“产品详情“；另一个团队负责“我的”； 这两个团队分别负责不同的代码，没有交叉的代码，端开发同学对号入座，原则上不会产生交叉资源。 这与之前普通的开发方式的区别是，之前端开发同学们相当于一个池子，有需求过来，这个版本需要做哪">
   
     <link rel="alternate" href="/atom.xml" title="刘哈笔记" type="application/atom+xml">
@@ -57,9 +57,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.liuxiaoming.com"></form>
@@ -82,7 +82,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      iOS开发方式的最佳实践思考与容器化方案之一
+      iOS容器化方案
     </h1>
   
 
@@ -107,7 +107,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.liuxiaoming.com/2017/09/05/ios-container/" data-id="cj7eeh76q0001fgck303bjd6i" class="article-share-link">Partager</a>
+      <a data-url="http://www.liuxiaoming.com/2017/09/05/ios-container/" data-id="cj7eeh76q0001fgck303bjd6i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Container/">Container</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/容器化/">容器化</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/最佳实践/">最佳实践</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/组件化/">组件化</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/解耦/">解耦</a></li></ul>
@@ -119,7 +119,7 @@
 <nav id="article-nav">
   
     <a href="/2017/09/07/ios-universal-links/" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Récent</strong>
+      <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
           iOS App间相互跳转漫谈 - part1
@@ -129,7 +129,7 @@
   
   
     <a href="/2017/08/21/App网络实时数据模拟方案/" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">Ancien</strong>
+      <strong class="article-nav-caption">Older</strong>
       <div class="article-nav-title">App网络实时数据模拟方案</div>
     </a>
   
@@ -147,7 +147,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Andoird/">Andoird</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Container/">Container</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DynamicLinks/">DynamicLinks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Google/">Google</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mock/">Mock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RealTime/">RealTime</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UniversalLinks/">UniversalLinks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iOS/">iOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/容器化/">容器化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/最佳实践/">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/组件化/">组件化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/解耦/">解耦</a></li></ul>
     </div>
@@ -157,7 +157,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
       <a href="/tags/Andoird/" style="font-size: 10px;">Andoird</a> <a href="/tags/Container/" style="font-size: 10px;">Container</a> <a href="/tags/DynamicLinks/" style="font-size: 15px;">DynamicLinks</a> <a href="/tags/Google/" style="font-size: 15px;">Google</a> <a href="/tags/Mock/" style="font-size: 10px;">Mock</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/RealTime/" style="font-size: 10px;">RealTime</a> <a href="/tags/UniversalLinks/" style="font-size: 15px;">UniversalLinks</a> <a href="/tags/iOS/" style="font-size: 20px;">iOS</a> <a href="/tags/容器化/" style="font-size: 10px;">容器化</a> <a href="/tags/最佳实践/" style="font-size: 10px;">最佳实践</a> <a href="/tags/组件化/" style="font-size: 10px;">组件化</a> <a href="/tags/解耦/" style="font-size: 10px;">解耦</a>
     </div>
@@ -168,7 +168,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li></ul>
     </div>
   </div>
 
@@ -176,9 +176,17 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/10/11/source-application-open/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/09/27/ios-xcassets-pdf/">(no title)</a>
+          </li>
         
           <li>
             <a href="/2017/09/10/ios-universal-links-2/">iOS App间相互跳转漫谈 - part2</a>
@@ -189,11 +197,7 @@
           </li>
         
           <li>
-            <a href="/2017/09/05/ios-container/">iOS开发方式的最佳实践思考与容器化方案之一</a>
-          </li>
-        
-          <li>
-            <a href="/2017/08/21/App网络实时数据模拟方案/">App网络实时数据模拟方案</a>
+            <a href="/2017/09/05/ios-container/">iOS容器化方案</a>
           </li>
         
       </ul>
@@ -210,7 +214,7 @@
     <div id="footer-info" class="inner">
       &copy; 2017 刘哈
       <br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       <br>
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1263739123'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1263739123%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
       
