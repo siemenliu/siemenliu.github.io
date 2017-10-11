@@ -52,9 +52,9 @@
       </nav>
       <nav id="sub-nav">
         
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="Flux RSS"></a>
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
         
-        <a id="nav-search-btn" class="nav-icon" title="Rechercher"></a>
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
         <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://www.liuxiaoming.com"></form>
@@ -64,6 +64,73 @@
 </header>
       <div class="outer">
         <section id="main">
+  
+    <article id="post-source-application-open" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/10/11/source-application-open/" class="article-date">
+  <time datetime="2017-10-11T14:47:07.000Z" itemprop="datePublished">2017-10-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="iOS如何识别App打开的来源"><a href="#iOS如何识别App打开的来源" class="headerlink" title="iOS如何识别App打开的来源"></a>iOS如何识别App打开的来源</h1><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>在数据统计方面层面看App打开来源非常重要，特别是对于分享以及付费引流的衡量效果上有着非常关键的作用。</p>
+<p>iOS App最常用的打开途径有三种：</p>
+<ol>
+<li>消息（本地、远程）推送打开</li>
+<li>scheme跳转打开</li>
+<li>UniversalLinks打开</li>
+</ol>
+<h2 id="如何区分"><a href="#如何区分" class="headerlink" title="如何区分"></a>如何区分</h2><p>App启动后标志着App底层已经准备完备的地方就有可以用来区分的标志，也就是在AppDelegate中的<code>application:didFinishLaunchingWithOptions:</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) &#123;</div><div class="line">    NSLog(@&quot;远程推送打开&quot;);</div><div class="line">&#125; else if (launchOptions[UIApplicationLaunchOptionsLocalNotificationKey]) &#123;</div><div class="line">    NSLog(@&quot;本地推送打开&quot;);</div><div class="line">&#125; else if (launchOptions[UIApplicationLaunchOptionsUserActivityDictionaryKey]) &#123;</div><div class="line">    NSLog(@&quot;UniversalLinks打开&quot;);</div><div class="line">&#125; else if (launchOptions[UIApplicationLaunchOptionsURLKey]) &#123;</div><div class="line">    NSLog(@&quot;Scheme跳转打开&quot;);</div><div class="line">&#125; else if (!launchOptions) &#123;</div><div class="line">    NSLog(@&quot;手动点击打开&quot;);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="再多说一些"><a href="#再多说一些" class="headerlink" title="再多说一些"></a>再多说一些</h2><p>launchOptions除了用来区分App的开发方式，还承载着打开时的一些数据，比如scheme跳转、UniversalLinks打开的时候的一些具体链接，之前应用的bundleID等数据方便追述。</p>
+<p>例如UniversalLinks中，我们就可以通过如下方法获得链接，而不一定要等到专用的Delegate方法返回给我们</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">NSUserActivity *act = [[launchOptions objectForKey:UIApplicationLaunchOptionsUserActivityDictionaryKey] objectForKey:@&quot;UIApplicationLaunchOptionsUserActivityKey&quot;];</div><div class="line">NSString *url = [act.webpageURL absoluteString];</div></pre></td></tr></table></figure>
+<h2 id="其他枚举的意义"><a href="#其他枚举的意义" class="headerlink" title="其他枚举的意义"></a>其他枚举的意义</h2><ul>
+<li><p>UIApplicationLaunchOptionsURLKey<br> 在scheme跳转打开的时候出现，用于获取scheme地址的key；如”enalibaba://home”</p>
+</li>
+<li><p>UIApplicationLaunchOptionsSourceApplicationKey<br> 从其他App跳转打开的时候出现 值为一个字符串表示来源App的BundleID；如：”com.apple.mobilesafari” 表示从Safari跳转</p>
+</li>
+<li><p>UIApplicationLaunchOptionsRemoteNotificationKey<br> 从远程推送打开，这个key对应的值是一个Dictionary，里面就是推送的Payload</p>
+</li>
+<li><p>UIApplicationLaunchOptionsLocalNotificationKey<br> 从本地推送打开，这个key对应的值是一个Dictionary，里面就是推送的Payload</p>
+</li>
+<li><p>UIApplicationLaunchOptionsAnnotationKey<br> 这个Key应该不会再看见了，它只能通过 <code>application:openURL:sourceApplication:annotation:</code> 打开App的时候才会出现，但这个方法已经被标记为 Deprecated 从9.0之后不再支持。</p>
+</li>
+<li><p>UIApplicationLaunchOptionsLocationKey<br> 基于地理位置触发的App打开，官方文档应该更新过了，已经找不到原文，大意是如果App开启了地理位置，在App退出到后台之后，如果触发了地理位置打开App，那么LaunchOptions就会有这个Key，可用来开启地理位置事件监听的标志，但这种地理位置触发打开App的能力需要App Store审核才能开启使用。</p>
+</li>
+<li><p>UIApplicationLaunchOptionsNewsstandDownloadsKey<br> 关于杂志更新的，用到极少，不多描述</p>
+</li>
+<li><p>UIApplicationLaunchOptionsBluetoothCentralsKey<br> 蓝牙服务提供设备唤醒App时出现的Key，数据为数组，代表设备列表</p>
+</li>
+<li><p>UIApplicationLaunchOptionsBluetoothPeripheralsKey<br> 蓝牙被服务设备唤醒App时出现的Key，数据为数组，代表设备列表</p>
+</li>
+<li><p>UIApplicationLaunchOptionsShortcutItemKey<br> 从3D Touch打开App时出现此Key</p>
+</li>
+<li><p>UIApplicationLaunchOptionsUserActivityDictionaryKey<br> UniversalLinks打开时出现此Key，用于获得继续打开行为的一些数据，通常是点击的链接</p>
+</li>
+<li><p>UIApplicationLaunchOptionsUserActivityTypeKey<br> UniversalLinks打开时出现此Key，值为NSUserActivityTypeBrowsingWeb，而且这个枚举值就这个以</p>
+</li>
+<li><p>UIApplicationLaunchOptionsCloudKitShareMetadataKey<br> A key indicating that the app received a CloudKit share invitation. 相关文档比较少，推测是从文件里分享给App打开时会出现此Key。</p>
+</li>
+</ul>
+<p>参考<br><a href="https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623073-application?language=objc" target="_blank" rel="external">https://developer.apple.com/documentation/uikit/uiapplicationdelegate/1623073-application?language=objc</a><br><a href="http://nshipster.cn/launch-options/" target="_blank" rel="external">http://nshipster.cn/launch-options/</a><br><a href="http://www.jianshu.com/p/2ab2716c334e" target="_blank" rel="external">http://www.jianshu.com/p/2ab2716c334e</a><br><a href="http://www.jianshu.com/p/6a1eb76ec776" target="_blank" rel="external">http://www.jianshu.com/p/6a1eb76ec776</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://www.liuxiaoming.com/2017/10/11/source-application-open/" data-id="cj8n5h1z20001dkckt4ahcuya" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
   
     <article id="post-ios-universal-links-2" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
@@ -134,7 +201,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.liuxiaoming.com/2017/09/10/ios-universal-links-2/" data-id="cj7eeh76w0003fgckcl05i1hl" class="article-share-link">Partager</a>
+      <a data-url="http://www.liuxiaoming.com/2017/09/10/ios-universal-links-2/" data-id="cj7eeh76w0003fgckcl05i1hl" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DynamicLinks/">DynamicLinks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Google/">Google</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/UniversalLinks/">UniversalLinks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li></ul>
@@ -225,7 +292,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.liuxiaoming.com/2017/09/07/ios-universal-links/" data-id="cj7eeh76y0004fgck2ajxj2qv" class="article-share-link">Partager</a>
+      <a data-url="http://www.liuxiaoming.com/2017/09/07/ios-universal-links/" data-id="cj7eeh76y0004fgck2ajxj2qv" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/DynamicLinks/">DynamicLinks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Google/">Google</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/UniversalLinks/">UniversalLinks</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li></ul>
@@ -251,7 +318,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2017/09/05/ios-container/">iOS开发方式的最佳实践思考与容器化方案之一</a>
+      <a class="article-title" href="/2017/09/05/ios-container/">iOS容器化方案</a>
     </h1>
   
 
@@ -276,7 +343,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.liuxiaoming.com/2017/09/05/ios-container/" data-id="cj7eeh76q0001fgck303bjd6i" class="article-share-link">Partager</a>
+      <a data-url="http://www.liuxiaoming.com/2017/09/05/ios-container/" data-id="cj7eeh76q0001fgck303bjd6i" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Container/">Container</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/容器化/">容器化</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/最佳实践/">最佳实践</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/组件化/">组件化</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/解耦/">解耦</a></li></ul>
@@ -359,7 +426,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://www.liuxiaoming.com/2017/08/21/App网络实时数据模拟方案/" data-id="cj7eeh76j0000fgckqphhwwkp" class="article-share-link">Partager</a>
+      <a data-url="http://www.liuxiaoming.com/2017/08/21/App网络实时数据模拟方案/" data-id="cj7eeh76j0000fgckqphhwwkp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Andoird/">Andoird</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Mock/">Mock</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Network/">Network</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/RealTime/">RealTime</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/iOS/">iOS</a></li></ul>
@@ -381,7 +448,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Mot-clés</h3>
+    <h3 class="widget-title">Tags</h3>
     <div class="widget">
       <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Andoird/">Andoird</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Container/">Container</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DynamicLinks/">DynamicLinks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Google/">Google</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mock/">Mock</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Network/">Network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RealTime/">RealTime</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/UniversalLinks/">UniversalLinks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/iOS/">iOS</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/容器化/">容器化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/最佳实践/">最佳实践</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/组件化/">组件化</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/解耦/">解耦</a></li></ul>
     </div>
@@ -391,7 +458,7 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Nuage de mot-clés</h3>
+    <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
       <a href="/tags/Andoird/" style="font-size: 10px;">Andoird</a> <a href="/tags/Container/" style="font-size: 10px;">Container</a> <a href="/tags/DynamicLinks/" style="font-size: 15px;">DynamicLinks</a> <a href="/tags/Google/" style="font-size: 15px;">Google</a> <a href="/tags/Mock/" style="font-size: 10px;">Mock</a> <a href="/tags/Network/" style="font-size: 10px;">Network</a> <a href="/tags/RealTime/" style="font-size: 10px;">RealTime</a> <a href="/tags/UniversalLinks/" style="font-size: 15px;">UniversalLinks</a> <a href="/tags/iOS/" style="font-size: 20px;">iOS</a> <a href="/tags/容器化/" style="font-size: 10px;">容器化</a> <a href="/tags/最佳实践/" style="font-size: 10px;">最佳实践</a> <a href="/tags/组件化/" style="font-size: 10px;">组件化</a> <a href="/tags/解耦/" style="font-size: 10px;">解耦</a>
     </div>
@@ -402,7 +469,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/10/">October 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/09/">September 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/08/">August 2017</a></li></ul>
     </div>
   </div>
 
@@ -410,9 +477,13 @@
   
     
   <div class="widget-wrap">
-    <h3 class="widget-title">Articles récents</h3>
+    <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2017/10/11/source-application-open/">(no title)</a>
+          </li>
         
           <li>
             <a href="/2017/09/10/ios-universal-links-2/">iOS App间相互跳转漫谈 - part2</a>
@@ -423,7 +494,7 @@
           </li>
         
           <li>
-            <a href="/2017/09/05/ios-container/">iOS开发方式的最佳实践思考与容器化方案之一</a>
+            <a href="/2017/09/05/ios-container/">iOS容器化方案</a>
           </li>
         
           <li>
@@ -444,7 +515,7 @@
     <div id="footer-info" class="inner">
       &copy; 2017 刘哈
       <br>
-      Propulsé by <a href="http://hexo.io/" target="_blank">Hexo</a>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
       <br>
 <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1263739123'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1263739123%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));</script>
       
